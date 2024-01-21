@@ -215,7 +215,7 @@ namespace Acycl_GUI
     private async void Start_Click(object sender, RoutedEventArgs e)
     {
       LoadingRing.Visibility = Visibility.Visible;
-      var ans = await Task.Run(() => AcyclByble.Start(points));
+      var ans = await Task.Run(() => AcyclByble.Start(this.points));
       var i = PointsCanvas;
       var toRemove = new List<Polygon>();
       foreach (var p in PointsCanvas.Children)
@@ -244,9 +244,22 @@ namespace Acycl_GUI
           }
         }
       }
-      foreach(var arr in ToAdd)
+      List<Grid> points = new List<Grid>();
+      for (int iter = 0; iter < PointsCanvas.Children.Count; iter++)
+      {
+        if (PointsCanvas.Children[iter] is Grid)
+        {
+          points.Add(PointsCanvas.Children[iter] as Grid);
+        }
+      }
+      foreach (var arr in ToAdd)
         PointsCanvas.Children.Add(arr);
-      points = ans;
+      foreach (var item in points)
+      {
+        PointsCanvas.Children.Remove(item);
+        PointsCanvas.Children.Add(item);
+      }
+      this.points = ans;
       LoadingRing.Visibility = Visibility.Hidden;
     }
 
@@ -298,6 +311,10 @@ namespace Acycl_GUI
       savedCanvas.Canvas.Children.Clear();
       foreach (var child in ch)
       {
+        if(child is Grid)
+        {
+          child.MouseDown += PointMouseDown;
+        }
         PointsCanvas.Children.Add(child);
       }
       foreach (var p in savedCanvas.Points)
